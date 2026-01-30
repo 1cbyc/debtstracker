@@ -2,13 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* User Requirement: Lowercase Typography */
-.lowercase-ui,
-.lowercase-ui * {
-  text-transform: lowercase;
-}
-
-/* Shadcn UI Variables (Dark Mode Only Palette inspired by Zinc/Slate) */
 @layer base {
   :root {
     --background: 240 10% 3.9%;
@@ -32,15 +25,24 @@
     --ring: 240 4.9% 83.9%;
     --radius: 0.5rem;
   }
-}
 
-@layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 
   body {
-    @apply bg-background text-foreground lowercase-ui;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  }
+
+  /* Apply lowercase to all text */
+  body * {
+    text-transform: lowercase;
   }
 }

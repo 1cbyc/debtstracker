@@ -30,8 +30,17 @@ export default function Home() {
           </Link>
         </div>
       </main>
-      <footer className="py-6 text-center text-sm text-muted-foreground border-t border-border">
-        &copy; {new Date().getFullYear()} debtstracker. all rights reserved.
+      <footer className="py-6 text-center text-sm text-muted-foreground border-t border-border flex flex-col gap-2">
+        <p>&copy; {new Date().getFullYear()} debtstracker. all rights reserved.</p>
+        <div className="flex justify-center gap-4 items-center">
+          <a href="https://github.com/1cbyc/debtstracker" target="_blank" rel="noopener noreferrer" className="hover:text-foreground flex items-center gap-1">
+            star on github
+          </a>
+          <span>•</span>
+          <a href="https://nsisong.com/projects" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
+            more projects
+          </a>
+        </div>
       </footer>
     </div>
   );

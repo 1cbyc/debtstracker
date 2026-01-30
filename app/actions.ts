@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { debts, goals, transactions } from "@/db/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -21,9 +21,15 @@ async function getAuthedUser() {
 const addDebtSchema = z.object({
     name: z.string().min(1),
     totalAmount: z.coerce.number().min(0),
-    currentBalance: z.coerce.number().min(0), // Can be same as total initially
+    currentBalance: z.coerce.number().min(0),
     currency: z.enum(["NGN", "USD", "GBP"]),
     priority: z.enum(["high", "medium", "low"]),
+});
+
+const addGoalSchema = z.object({
+    name: z.string().min(1),
+    targetAmount: z.coerce.number().min(0),
+    currentAmount: z.coerce.number().min(0),
 });
 
 export async function addDebt(formData: FormData) {
@@ -45,9 +51,6 @@ export async function addDebt(formData: FormData) {
 
     const { name, totalAmount, currentBalance, currency, priority } = validatedFields.data;
 
-    // Convert to cents/lowest unit if input is in standard units (e.g. 100.00 -> 10000)
-    // For now, assuming user inputs whole numbers or we handle conversion elsewhere. 
-    // Let's assume input is standard and we multiply by 100 for storage (integers).
     const totalAmountCents = Math.round(totalAmount * 100);
     const currentBalanceCents = Math.round(currentBalance * 100);
 
@@ -64,11 +67,41 @@ export async function addDebt(formData: FormData) {
     return { success: true };
 }
 
-export async function logPayment(debtId: string, amount: number) {
-    // amount in standard units
+export async function addGoal(formData: FormData) {
     const userId = await getAuthedUser();
 
-    // Verify ownership
+    const rawData = {
+        name: formData.get("name"),
+        targetAmount: formData.get("targetAmount"),
+        currentAmount: formData.get("currentAmount") || 0,
+    };
+
+    const validatedFields = addGoalSchema.safeParse(rawData);
+
+    if (!validatedFields.success) {
+        return { error: "Invalid fields" };
+    }
+
+    const { name, targetAmount, currentAmount } = validatedFields.data;
+
+    const targetAmountCents = Math.round(targetAmount * 100);
+    const currentAmountCents = Math.round(currentAmount * 100);
+
+    await db.insert(goals).values({
+        userId,
+        name,
+        targetAmount: targetAmountCents,
+        currentAmount: currentAmountCents,
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/goals");
+    return { success: true };
+}
+
+export async function logPayment(debtId: string, amount: number) {
+    const userId = await getAuthedUser();
+
     const debt = await db.query.debts.findFirst({
         where: (debts, { and, eq }) => and(eq(debts.id, debtId), eq(debts.userId, userId)),
     });
@@ -77,9 +110,7 @@ export async function logPayment(debtId: string, amount: number) {
 
     const amountCents = Math.round(amount * 100);
 
-    // Transaction
     await db.transaction(async (tx) => {
-        // Create transaction record
         await tx.insert(transactions).values({
             userId,
             debtId,
@@ -89,7 +120,6 @@ export async function logPayment(debtId: string, amount: number) {
             date: new Date(),
         });
 
-        // Update debt balance
         await tx
             .update(debts)
             .set({
@@ -105,8 +135,17 @@ export async function logPayment(debtId: string, amount: number) {
 export async function deleteDebt(debtId: string) {
     const userId = await getAuthedUser();
     await db.delete(debts).where(
-        // Ensure strict ownership
         sql`${debts.id} = ${debtId} AND ${debts.userId} = ${userId}`
     );
     revalidatePath("/dashboard");
+    revalidatePath("/dashboard/debts");
+}
+
+export async function deleteGoal(goalId: string) {
+    const userId = await getAuthedUser();
+    await db.delete(goals).where(
+        sql`${goals.id} = ${goalId} AND ${goals.userId} = ${userId}`
+    );
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/goals");
 }

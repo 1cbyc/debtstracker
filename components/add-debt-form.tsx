@@ -19,6 +19,7 @@ export function AddDebtForm() {
     const router = useRouter();
 
     async function handleSubmit(formData: FormData) {
+        if (pending) return;
         setPending(true);
         try {
             await addDebt(formData);
@@ -26,8 +27,7 @@ export function AddDebtForm() {
         } catch (e) {
             console.error(e);
             alert("Error adding debt");
-        } finally {
-            setPending(false);
+            setPending(false); // Only reset on error, otherwise we are redirecting
         }
     }
 
