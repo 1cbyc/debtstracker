@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Star } from "lucide-react";
 
 export default function Home() {
   return (
@@ -30,17 +31,30 @@ export default function Home() {
           </Link>
         </div>
       </main>
-      <footer className="py-6 text-center text-sm text-muted-foreground border-t border-border flex flex-col gap-2">
-        <p>&copy; {new Date().getFullYear()} debtstracker. all rights reserved.</p>
-        <div className="flex justify-center gap-4 items-center">
-          <a href="https://github.com/1cbyc/debtstracker" target="_blank" rel="noopener noreferrer" className="hover:text-foreground flex items-center gap-1">
-            star on github
+      <footer className="py-8 text-center text-sm text-muted-foreground border-t border-border flex flex-col gap-6 items-center">
+        <div className="flex flex-col sm:flex-row gap-4 items-center">
+          <a
+            href="https://github.com/1cbyc/debtstracker"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-card hover:bg-secondary/50 hover:border-foreground/20 transition-all duration-300"
+          >
+            <Star className="w-4 h-4 fill-current group-hover:text-yellow-400 text-muted-foreground transition-colors" />
+            <span className="font-medium text-foreground">star on github</span>
           </a>
-          <span>•</span>
-          <a href="https://nsisong.com/projects" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
-            more projects
+          <a
+            href="https://nsisong.com/projects"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-card hover:bg-secondary/50 hover:border-foreground/20 transition-all duration-300"
+          >
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="font-medium text-foreground">more projects</span>
           </a>
         </div>
+        <p className="text-xs text-muted-foreground/50">
+          &copy; {new Date().getFullYear()} debtstracker. all rights reserved.
+        </p>
       </footer>
     </div>
   );
