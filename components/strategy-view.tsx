@@ -283,8 +283,8 @@ export default function StrategyView({ debts }: StrategyViewProps) {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="font-medium">{formatDate(debt.payoffDate)}</div>
-                                        <div className="text-sm text-muted-foreground">
+                                        <div className="text-sm text-muted-foreground">{formatDate(debt.payoffDate)}</div>
+                                        <div className="text-xs text-muted-foreground/70">
                                             Month {debt.payoffMonth}
                                         </div>
                                         <ArrowRight className="h-4 w-4 text-muted-foreground mx-auto mt-2" />

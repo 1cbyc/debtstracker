@@ -54,7 +54,7 @@ export default function WhatIfScenarios({ debts }: WhatIfScenariosProps) {
 
   // Helper function to format time to freedom
   const formatTimeToFreedom = (months: number) => {
-    if (months <= 0) return "Already debt-free!";
+    if (months <= 0) return "Debt-free!";
     const years = Math.floor(months / 12);
     const remainingMonths = months % 12;
     if (years === 0) return `${months} months`;
@@ -106,7 +106,7 @@ export default function WhatIfScenarios({ debts }: WhatIfScenariosProps) {
 
 
   const getScenarioColor = (scenarioId: string) => {
-    if (scenarioId === bestScenario.scenario.id) return "border-green-500 bg-green-50";
+    if (scenarioId === bestScenario.scenario.id) return "border-green-500 bg-green-50 text-emerald-950";
     return "border-border";
   };
 
@@ -135,13 +135,13 @@ export default function WhatIfScenarios({ debts }: WhatIfScenariosProps) {
             {scenarioResults.map(result => (
               <div 
                 key={result.scenario.id} 
-                className={`border rounded-lg p-4 ${getScenarioColor(result.scenario.id)}`}
+                className={`relative border rounded-lg p-4 ${getScenarioColor(result.scenario.id)}`}
               >
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex items-center gap-2">
+                <div className="space-y-2 md:space-y-0 mb-3">
+                  <div className="flex flex-wrap items-center gap-2 justify-between md:justify-start">
                     <h4 className="font-semibold">{result.scenario.name}</h4>
                     {result.scenario.id === bestScenario.scenario.id && (
-                      <Badge className="bg-green-100 text-green-800">
+                      <Badge className="bg-white text-green-800 border border-green-800">
                         <Zap className="h-3 w-3 mr-1" />
                         Best Option
                       </Badge>
@@ -151,14 +151,16 @@ export default function WhatIfScenarios({ debts }: WhatIfScenariosProps) {
                     </Badge>
                   </div>
                   {scenarios.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeScenario(result.scenario.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Remove
-                    </Button>
+                    <div className="flex justify-end md:absolute md:top-4 md:right-4">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeScenario(result.scenario.id)}
+                        className="text-red-500 hover:text-red-700 min-h-[44px] min-w-[44px]"
+                      >
+                        Remove
+                      </Button>
+                    </div>
                   )}
                 </div>
 
@@ -178,7 +180,7 @@ export default function WhatIfScenarios({ debts }: WhatIfScenariosProps) {
                       <Clock className="h-3 w-3" />
                       Time to Freedom
                     </div>
-                    <div className="font-semibold">{result.timeToFreedom}</div>
+                    <div className="font-semibold break-words">{result.timeToFreedom}</div>
                   </div>
                   
                   <div>

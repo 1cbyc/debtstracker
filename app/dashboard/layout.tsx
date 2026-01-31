@@ -26,7 +26,7 @@ export default async function DashboardLayout({
             
             {/* Main Content - Responsive padding */}
             <main className="md:pl-64 min-h-screen">
-                <div className="container max-w-6xl mx-auto p-4 md:p-8">
+                <div className="container max-w-6xl mx-auto p-4 md:p-8 pb-32">
                     {children}
                 </div>
             </main>
