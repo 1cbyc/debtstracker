@@ -15,6 +15,20 @@
       "when": 1769805842031,
       "tag": "0001_slimy_colonel_america",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1769863341082,
+      "tag": "0002_silent_vampiro",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1769863888206,
+      "tag": "0003_red_marten_broadcloak",
+      "breakpoints": true
     }
   ]
 }

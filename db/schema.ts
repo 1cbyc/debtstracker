@@ -8,6 +8,7 @@ import {
     boolean,
     primaryKey,
     bigint,
+    index,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
@@ -88,7 +89,11 @@ export const debts = pgTable("debt", {
     dueDate: timestamp("next_payment_date", { mode: "date" }).notNull(), // Specific date for next payment
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => [
+    index("debts_user_id_idx").on(table.userId),
+    index("debts_priority_idx").on(table.priority),
+    index("debts_due_date_idx").on(table.dueDate),
+]);
 
 export const transactions = pgTable("transaction", {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -97,6 +102,7 @@ export const transactions = pgTable("transaction", {
         .references(() => users.id, { onDelete: "cascade" }),
     debtId: uuid("debt_id").references(() => debts.id, { onDelete: "set null" }), // Optional, can be a general expense
     amount: bigint("amount", { mode: "number" }).notNull(), // Positive for payment/income, negative for expense? Or just value with type.
+    currency: varchar("currency", { length: 3 }).notNull(), // NGN, USD, GBP - required for multi-currency support
     // Actually, usually transactions are "out" or "in".
     // For 'payment' (towards debt), it reduces debt.
     // For 'expense', it's just spending.
@@ -104,7 +110,12 @@ export const transactions = pgTable("transaction", {
     category: text("category").notNull(),
     date: timestamp("date").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+    index("transactions_user_id_idx").on(table.userId),
+    index("transactions_debt_id_idx").on(table.debtId),
+    index("transactions_date_idx").on(table.date),
+    index("transactions_type_idx").on(table.type),
+]);
 
 export const goals = pgTable("goal", {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -114,6 +125,9 @@ export const goals = pgTable("goal", {
     name: text("name").notNull(),
     targetAmount: bigint("target_amount", { mode: "number" }).notNull(),
     currentAmount: bigint("current_amount", { mode: "number" }).notNull().default(0),
+    currency: varchar("currency", { length: 3 }).notNull(), // NGN, USD, GBP
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => [
+    index("goals_user_id_idx").on(table.userId),
+]);

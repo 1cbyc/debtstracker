@@ -1,43 +1,42 @@
 "use client";
 
-import { addDebt } from "@/app/actions";
+import { editDebt } from "@/app/actions";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"; // Need to create Input
-import { Label } from "@/components/ui/label"; // Need to create Label
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useToast } from "@/components/toast-provider";
 
-// I need Input and Label components. I will create them inline or separate.
-// To save tools, I'll simulate them with HTML for now or create them in next step.
-// I'll assume they exist or use standard HTML with tailwind classes.
-// User wants Shadcn UI. I should probably create them.
-// Let's create them in this step if possible, or use standard HTML.
-// I will use standard HTML with valid tailwind classes looking like shadcn.
+interface Debt {
+    id: string;
+    name: string;
+    totalAmount: number;
+    currentBalance: number;
+    currency: string;
+    priority: string;
+    interestRate: number;
+    minimumPayment: number;
+    dueDate: Date;
+}
 
-export function AddDebtForm() {
+export function EditDebtForm({ debt }: { debt: Debt }) {
     const [pending, setPending] = useState(false);
-    const { showToast } = useToast();
     const router = useRouter();
 
     async function handleSubmit(formData: FormData) {
         if (pending) return;
         setPending(true);
         try {
-            const result = await addDebt(formData);
-            if (result?.error) {
-                showToast("error", "Error adding debt", result.error);
-                setPending(false);
-            } else {
-                showToast("success", "Debt added successfully", "Your new debt has been added to your dashboard.");
-                router.push("/dashboard");
-            }
+            await editDebt(debt.id, formData);
+            router.push("/dashboard");
         } catch (e) {
             console.error(e);
-            showToast("error", "Error adding debt", "Something went wrong. Please try again.");
+            alert("Error updating debt");
             setPending(false);
         }
     }
+
+    const formatDateForInput = (date: Date) => {
+        return date.toISOString().split('T')[0];
+    };
 
     return (
         <form action={handleSubmit} className="space-y-6 max-w-md mx-auto">
@@ -50,6 +49,7 @@ export function AddDebtForm() {
                     name="name"
                     id="name"
                     required
+                    defaultValue={debt.name}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     placeholder="e.g. bank loan"
                 />
@@ -66,6 +66,7 @@ export function AddDebtForm() {
                         id="totalAmount"
                         required
                         step="0.01"
+                        defaultValue={(debt.totalAmount / 100).toString()}
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     />
                 </div>
@@ -79,6 +80,7 @@ export function AddDebtForm() {
                         id="currentBalance"
                         required
                         step="0.01"
+                        defaultValue={(debt.currentBalance / 100).toString()}
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     />
                 </div>
@@ -92,6 +94,7 @@ export function AddDebtForm() {
                     <select
                         name="currency"
                         id="currency"
+                        defaultValue={debt.currency}
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     >
                         <option value="NGN">ngn</option>
@@ -106,6 +109,7 @@ export function AddDebtForm() {
                     <select
                         name="priority"
                         id="priority"
+                        defaultValue={debt.priority}
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     >
                         <option value="high">high</option>
@@ -115,45 +119,62 @@ export function AddDebtForm() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <label className="text-sm font-medium">apr (%) - 0 if none</label>
-                    <Input
+                    <label htmlFor="interestRate" className="text-sm font-medium leading-none">
+                        interest rate (%)
+                    </label>
+                    <input
+                        type="number"
                         name="interestRate"
-                        type="number"
+                        id="interestRate"
                         step="0.01"
-                        min="0"
-                        required
-                        defaultValue="0"
-                        className="bg-background"
+                        defaultValue={(debt.interestRate / 100).toString()}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     />
                 </div>
                 <div className="space-y-2">
-                    <label className="text-sm font-medium">min. pay</label>
-                    <Input
+                    <label htmlFor="minimumPayment" className="text-sm font-medium leading-none">
+                        minimum payment
+                    </label>
+                    <input
+                        type="number"
                         name="minimumPayment"
-                        type="number"
+                        id="minimumPayment"
                         step="0.01"
-                        min="0"
-                        required
-                        defaultValue="0"
-                        className="bg-background"
-                    />
-                </div>
-                <div className="space-y-2">
-                    <label className="text-sm font-medium">next due date</label>
-                    <Input
-                        name="dueDate"
-                        type="date"
-                        required
-                        className="bg-background"
+                        defaultValue={(debt.minimumPayment / 100).toString()}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     />
                 </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={pending}>
-                {pending ? "saving..." : "add debt"}
-            </Button>
+            <div className="space-y-2">
+                <label htmlFor="dueDate" className="text-sm font-medium leading-none">
+                    next payment due date
+                </label>
+                <input
+                    type="date"
+                    name="dueDate"
+                    id="dueDate"
+                    required
+                    defaultValue={formatDateForInput(debt.dueDate)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+            </div>
+
+            <div className="flex gap-4">
+                <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => router.push("/dashboard")}
+                >
+                    cancel
+                </Button>
+                <Button type="submit" className="flex-1" disabled={pending}>
+                    {pending ? "updating..." : "update debt"}
+                </Button>
+            </div>
         </form>
     );
 }

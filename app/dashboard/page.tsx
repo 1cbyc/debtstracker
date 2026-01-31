@@ -37,14 +37,8 @@ async function getDashboardData(userId: string) {
     // Group paid totals by currency
     const paidByCurrency: Record<string, number> = {};
     monthlyTransactions.forEach(t => {
-        // Find currency from linked debt (assuming we can get it, but transactions have debtId)
-        // Ideally transaction should store currency, but for now we look up the debt or simplify.
-        // Wait, if debt is deleted transaction remains... 
-        // For accurate reporting, let's just sum up assuming NGN for now or try to match debt.
-        // A robust solution would store currency on transaction. 
-        // Let's match with userDebts for now if active.
-        const debt = userDebts.find(d => d.id === t.debtId);
-        const currency = debt?.currency || "NGN"; // Fallback
+        // Use currency directly from transaction - no fallback needed since currency is required
+        const currency = t.currency;
         paidByCurrency[currency] = (paidByCurrency[currency] || 0) + t.amount;
     });
 
@@ -148,9 +142,29 @@ export default async function Dashboard() {
                                 <CardHeader className="pb-2">
                                     <div className="flex justify-between items-start">
                                         <CardTitle className="text-lg truncate pr-2">{debt.name}</CardTitle>
-                                        <Badge variant={debt.priority === 'high' ? 'destructive' : 'secondary'}>
-                                            {debt.priority}
-                                        </Badge>
+                                        <div className="flex items-center gap-2">
+                                            <Badge variant={debt.priority === 'high' ? 'destructive' : 'secondary'}>
+                                                {debt.priority}
+                                            </Badge>
+                                            <div className="flex gap-1">
+                                                <Link href={`/dashboard/debts/edit/${debt.id}`}>
+                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                        <span className="sr-only">Edit</span>
+                                                        ✏️
+                                                    </Button>
+                                                </Link>
+                                                <form action={async () => {
+                                                    "use server";
+                                                    const { deleteDebt } = await import("@/app/actions");
+                                                    await deleteDebt(debt.id);
+                                                }} className="inline">
+                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-red-500 hover:text-red-700">
+                                                        <span className="sr-only">Delete</span>
+                                                        🗑️
+                                                    </Button>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
                                 </CardHeader>
                                 <CardContent>

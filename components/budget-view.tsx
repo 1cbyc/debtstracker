@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { addTransaction } from "@/app/actions";
 import { format } from "date-fns";
 import { Wallet, TrendingUp, TrendingDown, Snowflake } from "lucide-react";
-import { Debt } from "@/lib/strategy";
+import { useToast } from "@/components/toast-provider";
 
 interface Transaction {
     id: string;
@@ -18,12 +18,20 @@ interface Transaction {
     debtId?: string | null;
 }
 
+interface Debt {
+    id: string;
+    name: string;
+    currentBalance: number;
+}
+
 export default function BudgetView({ transactions, debts }: { transactions: Transaction[], debts: Debt[] }) {
     const [amount, setAmount] = useState("");
     const [category, setCategory] = useState("general");
     const [type, setType] = useState<"income" | "expense" | "payment">("expense");
     const [selectedDebtId, setSelectedDebtId] = useState<string>("");
+    const [currency, setCurrency] = useState<"NGN" | "USD" | "GBP">("NGN");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { showToast } = useToast();
 
     const totalIncome = transactions
         .filter(t => t.type === "income")
@@ -56,15 +64,22 @@ export default function BudgetView({ transactions, debts }: { transactions: Tran
             formData.append("amount", amount);
             formData.append("type", type);
             formData.append("category", category);
+            formData.append("currency", currency);
             if (type === "payment" && selectedDebtId) {
                 formData.append("debtId", selectedDebtId);
             }
 
-            await addTransaction(formData);
-            setAmount("");
-            setCategory("general");
+            const result = await addTransaction(formData);
+            if (result?.error) {
+                showToast("error", "Error logging transaction", result.error);
+            } else {
+                showToast("success", "Transaction logged", `${type} of ${currency} ${amount} recorded successfully.`);
+                setAmount("");
+                setCategory("general");
+            }
         } catch (error) {
             console.error(error);
+            showToast("error", "Error logging transaction", "Something went wrong. Please try again.");
         } finally {
             setIsSubmitting(false);
         }
@@ -143,14 +158,26 @@ export default function BudgetView({ transactions, debts }: { transactions: Tran
 
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">amount</label>
-                                <Input
-                                    type="number"
-                                    step="0.01"
-                                    value={amount}
-                                    onChange={(e) => setAmount(e.target.value)}
-                                    required
-                                    placeholder="0.00"
-                                />
+                                <div className="flex gap-2">
+                                    <select
+                                        className="flex h-10 w-20 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        value={currency}
+                                        onChange={(e) => setCurrency(e.target.value as "NGN" | "USD" | "GBP")}
+                                    >
+                                        <option value="NGN">NGN</option>
+                                        <option value="USD">USD</option>
+                                        <option value="GBP">GBP</option>
+                                    </select>
+                                    <Input
+                                        type="number"
+                                        step="0.01"
+                                        value={amount}
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        required
+                                        placeholder="0.00"
+                                        className="flex-1"
+                                    />
+                                </div>
                             </div>
 
                             {type === "payment" ? (

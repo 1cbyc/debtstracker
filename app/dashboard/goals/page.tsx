@@ -52,14 +52,23 @@ export default async function GoalsPage() {
                         <Card key={goal.id}>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="font-semibold text-lg">{goal.name}</CardTitle>
-                                <form action={async () => {
-                                    "use server";
-                                    await deleteGoal(goal.id);
-                                }}>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </form>
+                                <div className="flex gap-1">
+                                    <Link href={`/dashboard/goals/edit/${goal.id}`}>
+                                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                            <span className="sr-only">Edit</span>
+                                            ✏️
+                                        </Button>
+                                    </Link>
+                                    <form action={async () => {
+                                        "use server";
+                                        await deleteGoal(goal.id);
+                                    }} className="inline">
+                                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-red-500 hover:text-red-700">
+                                            <span className="sr-only">Delete</span>
+                                            🗑️
+                                        </Button>
+                                    </form>
+                                </div>
                             </CardHeader>
                             <CardContent>
                                 <div className="mt-2 space-y-1">
