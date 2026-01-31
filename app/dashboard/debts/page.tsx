@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { deleteDebt } from "@/app/actions";
-import { getOrdinalSuffix } from "@/lib/utils";
 
 export default async function DebtsPage() {
     const session = await auth();

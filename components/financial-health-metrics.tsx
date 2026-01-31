@@ -77,11 +77,11 @@ export default function FinancialHealthMetrics({
   const formatRatio = (ratio: number) => `${ratio.toFixed(1)}%`;
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       {/* Financial Health Score */}
       <Card className="col-span-full lg:col-span-2">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="pb-2 md:pb-4">
+          <CardTitle className="flex items-center gap-2 text-base md:text-lg">
             <HealthIcon className="h-5 w-5" />
             Financial Health Score
           </CardTitle>

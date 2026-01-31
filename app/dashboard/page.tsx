@@ -117,11 +117,11 @@ export default async function Dashboard() {
     };
 
     return (
-        <div className="space-y-8">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <div className="space-y-6 md:space-y-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Dashboard</h1>
                 <Link href="/dashboard/debts/add">
-                    <Button size="sm" className="gap-2">
+                    <Button size="sm" className="gap-2 w-full sm:w-auto min-h-[44px] sm:min-h-0">
                         <Plus className="h-4 w-4" /> Add Debt
                     </Button>
                 </Link>
@@ -129,7 +129,7 @@ export default async function Dashboard() {
 
             {/* Financial Health Analytics */}
             <div className="space-y-4">
-                <h2 className="text-xl font-bold tracking-tight">Financial Health Overview</h2>
+                <h2 className="text-lg md:text-xl font-bold tracking-tight">Financial Health Overview</h2>
                 <FinancialHealthMetrics
                     totalDebt={debtByCurrency}
                     totalSavings={totalSavings}
@@ -174,71 +174,132 @@ export default async function Dashboard() {
 
             <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold tracking-tight">Active Debts</h2>
+                    <h2 className="text-lg md:text-xl font-bold tracking-tight">Active Debts</h2>
                     <Link href="/dashboard/debts" className="text-sm text-muted-foreground hover:underline">View All</Link>
                 </div>
 
                 {userDebts.length === 0 ? (
-                    <div className="text-center py-12 border border-dashed rounded-lg bg-card">
+                    <div className="text-center py-8 md:py-12 border border-dashed rounded-lg bg-card">
                         <p className="text-muted-foreground">No debts recorded. You're financially free!</p>
                     </div>
                 ) : (
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {userDebts.slice(0, 6).map((debt) => (
-                            <Card key={debt.id} className="relative overflow-hidden">
-                                <div className={`absolute left-0 top-0 bottom-0 w-1 ${debt.priority === 'high' ? 'bg-red-500' :
-                                    debt.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                                    }`} />
-                                <CardHeader className="pb-2">
-                                    <div className="flex justify-between items-start">
-                                        <CardTitle className="text-lg truncate pr-2">{debt.name}</CardTitle>
-                                        <div className="flex items-center gap-2">
-                                            <Badge variant={debt.priority === 'high' ? 'destructive' : 'secondary'}>
-                                                {debt.priority}
-                                            </Badge>
-                                            <div className="flex gap-1">
-                                                <Link href={`/dashboard/debts/edit/${debt.id}`}>
-                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                                        <span className="sr-only">Edit</span>
-                                                        <Edit className="h-3 w-3" />
-                                                    </Button>
-                                                </Link>
-                                                <form action={async () => {
-                                                    "use server";
-                                                    const { deleteDebt } = await import("@/app/actions");
-                                                    await deleteDebt(debt.id);
-                                                }} className="inline">
-                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-red-500 hover:text-red-700">
-                                                        <span className="sr-only">Delete</span>
-                                                        <Trash2 className="h-3 w-3" />
-                                                    </Button>
-                                                </form>
+                    <>
+                        {/* Desktop Grid View */}
+                        <div className="hidden md:grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {userDebts.slice(0, 6).map((debt) => (
+                                <Card key={debt.id} className="relative overflow-hidden">
+                                    <div className={`absolute left-0 top-0 bottom-0 w-1 ${debt.priority === 'high' ? 'bg-red-500' :
+                                        debt.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                                        }`} />
+                                    <CardHeader className="pb-2">
+                                        <div className="flex justify-between items-start">
+                                            <CardTitle className="text-lg truncate pr-2">{debt.name}</CardTitle>
+                                            <div className="flex items-center gap-2">
+                                                <Badge variant={debt.priority === 'high' ? 'destructive' : 'secondary'}>
+                                                    {debt.priority}
+                                                </Badge>
+                                                <div className="flex gap-1">
+                                                    <Link href={`/dashboard/debts/edit/${debt.id}`}>
+                                                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                            <span className="sr-only">Edit</span>
+                                                            <Edit className="h-3 w-3" />
+                                                        </Button>
+                                                    </Link>
+                                                    <form action={async () => {
+                                                        "use server";
+                                                        const { deleteDebt } = await import("@/app/actions");
+                                                        await deleteDebt(debt.id);
+                                                    }} className="inline">
+                                                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-red-500 hover:text-red-700">
+                                                            <span className="sr-only">Delete</span>
+                                                            <Trash2 className="h-3 w-3" />
+                                                        </Button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-1">
-                                        <p className="text-2xl font-bold">
-                                            {formatMoney(debt.currentBalance, debt.currency)}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            of {formatMoney(debt.totalAmount, debt.currency)} original
-                                        </p>
-                                        <div className="w-full bg-secondary h-2 rounded-full mt-2 overflow-hidden">
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="space-y-1">
+                                            <p className="text-2xl font-bold">
+                                                {formatMoney(debt.currentBalance, debt.currency)}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                of {formatMoney(debt.totalAmount, debt.currency)} original
+                                            </p>
+                                            <div className="w-full bg-secondary h-2 rounded-full mt-2 overflow-hidden">
+                                                <div
+                                                    className="bg-primary h-full transition-all duration-500"
+                                                    style={{ width: `${Math.max(0, 100 - (debt.currentBalance / debt.totalAmount * 100))}%` }}
+                                                />
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                                {Math.max(0, 100 - (debt.currentBalance / debt.totalAmount * 100)).toFixed(1)}% paid off
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+
+                        {/* Mobile Card Stack View */}
+                        <div className="md:hidden space-y-3">
+                            {userDebts.slice(0, 6).map((debt) => (
+                                <Card key={debt.id} className="relative overflow-hidden">
+                                    <div className={`absolute left-0 top-0 bottom-0 w-1 ${debt.priority === 'high' ? 'bg-red-500' :
+                                        debt.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                                        }`} />
+                                    <CardContent className="p-4">
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <h3 className="font-semibold truncate">{debt.name}</h3>
+                                                    <Badge 
+                                                        variant={debt.priority === 'high' ? 'destructive' : 'secondary'}
+                                                        className="text-xs shrink-0"
+                                                    >
+                                                        {debt.priority}
+                                                    </Badge>
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {Math.max(0, 100 - (debt.currentBalance / debt.totalAmount * 100)).toFixed(1)}% paid off
+                                                </p>
+                                            </div>
+                                            <div className="text-right shrink-0">
+                                                <p className="text-lg font-bold">
+                                                    {formatMoney(debt.currentBalance, debt.currency)}
+                                                </p>
+                                                <div className="flex gap-1 justify-end mt-1">
+                                                    <Link href={`/dashboard/debts/edit/${debt.id}`}>
+                                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 min-h-[44px] min-w-[44px]">
+                                                            <span className="sr-only">Edit</span>
+                                                            <Edit className="h-4 w-4" />
+                                                        </Button>
+                                                    </Link>
+                                                    <form action={async () => {
+                                                        "use server";
+                                                        const { deleteDebt } = await import("@/app/actions");
+                                                        await deleteDebt(debt.id);
+                                                    }} className="inline">
+                                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-500 hover:text-red-700 min-h-[44px] min-w-[44px]">
+                                                            <span className="sr-only">Delete</span>
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="w-full bg-secondary h-2 rounded-full mt-3 overflow-hidden">
                                             <div
                                                 className="bg-primary h-full transition-all duration-500"
                                                 style={{ width: `${Math.max(0, 100 - (debt.currentBalance / debt.totalAmount * 100))}%` }}
                                             />
                                         </div>
-                                        <div className="text-xs text-muted-foreground">
-                                            {Math.max(0, 100 - (debt.currentBalance / debt.totalAmount * 100)).toFixed(1)}% paid off
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </>
                 )}
             </div>
         </div>
