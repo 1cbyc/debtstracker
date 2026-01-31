@@ -26,9 +26,9 @@ export default function FinancialHealthMetrics({
 }: FinancialHealthProps) {
   
   // Calculate debt-to-income ratio (using primary currency NGN as base)
-  const primaryDebt = totalDebt.NGN || 0;
+  const primaryMonthlyPayments = monthlyPayments.NGN || 0;
   const primaryIncome = monthlyIncome.NGN || 1; // Prevent division by zero
-  const debtToIncomeRatio = primaryIncome > 0 ? (primaryDebt / (primaryIncome * 12)) * 100 : 0;
+  const debtToIncomeRatio = primaryIncome > 0 ? (primaryMonthlyPayments / primaryIncome) * 100 : 0;
   
   // Calculate financial health score (0-100)
   const calculateHealthScore = () => {
@@ -77,9 +77,9 @@ export default function FinancialHealthMetrics({
   const formatRatio = (ratio: number) => `${ratio.toFixed(1)}%`;
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {/* Financial Health Score */}
-      <Card className="col-span-full md:col-span-2">
+      <Card className="col-span-full lg:col-span-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <HealthIcon className="h-5 w-5" />
@@ -103,7 +103,7 @@ export default function FinancialHealthMetrics({
       {/* Debt-to-Income Ratio */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Debt-to-Income</CardTitle>
+          <CardTitle className="text-sm font-medium leading-tight">Debt-to-Income</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatRatio(debtToIncomeRatio)}</div>
@@ -122,7 +122,7 @@ export default function FinancialHealthMetrics({
       {/* Emergency Fund Status */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Emergency Fund</CardTitle>
+          <CardTitle className="text-sm font-medium leading-tight">Emergency Fund</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(totalSavings)}</div>
