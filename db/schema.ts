@@ -7,6 +7,7 @@ import {
     varchar,
     boolean,
     primaryKey,
+    bigint,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
@@ -77,11 +78,14 @@ export const debts = pgTable("debt", {
         .notNull()
         .references(() => users.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    // Storing amounts in cents/lowest unit to avoid floating point errors
-    totalAmount: integer("total_amount").notNull(),
-    currentBalance: integer("current_balance").notNull(),
+    // Storing amounts in cents/lowest unit. Using bigint for values > 2B.
+    totalAmount: bigint("total_amount", { mode: "number" }).notNull(),
+    currentBalance: bigint("current_balance", { mode: "number" }).notNull(),
     currency: varchar("currency", { length: 3 }).notNull(), // NGN, USD, GBP
     priority: text("priority", { enum: ["high", "medium", "low"] }).notNull(),
+    interestRate: integer("interest_rate").default(0).notNull(), // Basis points: 500 = 5.00%
+    minimumPayment: bigint("minimum_payment", { mode: "number" }).default(0).notNull(), // Cents
+    dueDate: timestamp("next_payment_date", { mode: "date" }).notNull(), // Specific date for next payment
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -92,11 +96,11 @@ export const transactions = pgTable("transaction", {
         .notNull()
         .references(() => users.id, { onDelete: "cascade" }),
     debtId: uuid("debt_id").references(() => debts.id, { onDelete: "set null" }), // Optional, can be a general expense
-    amount: integer("amount").notNull(), // Positive for payment/income, negative for expense? Or just value with type.
+    amount: bigint("amount", { mode: "number" }).notNull(), // Positive for payment/income, negative for expense? Or just value with type.
     // Actually, usually transactions are "out" or "in".
     // For 'payment' (towards debt), it reduces debt.
     // For 'expense', it's just spending.
-    type: text("type", { enum: ["payment", "expense"] }).notNull(),
+    type: text("type", { enum: ["payment", "expense", "income"] }).notNull(),
     category: text("category").notNull(),
     date: timestamp("date").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -108,8 +112,8 @@ export const goals = pgTable("goal", {
         .notNull()
         .references(() => users.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    targetAmount: integer("target_amount").notNull(),
-    currentAmount: integer("current_amount").notNull().default(0),
+    targetAmount: bigint("target_amount", { mode: "number" }).notNull(),
+    currentAmount: bigint("current_amount", { mode: "number" }).notNull().default(0),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

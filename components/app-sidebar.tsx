@@ -5,7 +5,10 @@ import {
     CreditCard,
     Target,
     LogOut,
-    User
+    User,
+    TrendingUp,
+    Wallet,
+    FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -30,6 +33,24 @@ export async function AppSidebar() {
                     <Button variant="ghost" className="w-full justify-start gap-2">
                         <CreditCard className="h-4 w-4" />
                         debts
+                    </Button>
+                </Link>
+                <Link href="/dashboard/strategy">
+                    <Button variant="ghost" className="w-full justify-start gap-2">
+                        <TrendingUp className="h-4 w-4" />
+                        strategy
+                    </Button>
+                </Link>
+                <Link href="/dashboard/budget">
+                    <Button variant="ghost" className="w-full justify-start gap-2">
+                        <Wallet className="h-4 w-4" />
+                        budget
+                    </Button>
+                </Link>
+                <Link href="/dashboard/reports">
+                    <Button variant="ghost" className="w-full justify-start gap-2">
+                        <FileText className="h-4 w-4" />
+                        reports
                     </Button>
                 </Link>
                 <Link href="/dashboard/goals">
@@ -70,6 +91,6 @@ export async function AppSidebar() {
                     </Button>
                 </form>
             </div>
-        </aside>
+        </aside >
     );
 }

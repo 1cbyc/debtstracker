@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { deleteDebt } from "@/app/actions";
+import { getOrdinalSuffix } from "@/lib/utils";
 
 export default async function DebtsPage() {
     const session = await auth();
@@ -42,9 +43,17 @@ export default async function DebtsPage() {
             {userDebts.length === 0 ? (
                 <div className="text-center py-20 border border-dashed rounded-lg bg-card">
                     <p className="text-muted-foreground mb-4">no active debts. clean slate!</p>
-                    <Link href="/dashboard/debts/add">
-                        <Button>add your first debt</Button>
-                    </Link>
+                    <div className="flex gap-4">
+                        <Link href="/dashboard/debts/add">
+                            <Button>add your first debt</Button>
+                        </Link>
+                        <Link href="/dashboard/budget">
+                            <Button variant="outline">setup budget</Button>
+                        </Link>
+                        <Link href="/dashboard/strategy">
+                            <Button variant="secondary">view strategy</Button>
+                        </Link>
+                    </div>
                 </div>
             ) : (
                 <div className="grid gap-4">
@@ -59,9 +68,19 @@ export default async function DebtsPage() {
                                         <h3 className="font-semibold text-lg">{debt.name}</h3>
                                         <Badge variant="outline">{debt.priority}</Badge>
                                     </div>
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-muted-foreground">next due</span>
+                                        <span className="font-medium">
+                                            {(debt.dueDate as Date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                                        </span>
+                                    </div>
                                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                         <span>bal: {formatMoney(debt.currentBalance, debt.currency)}</span>
                                         <span>total: {formatMoney(debt.totalAmount, debt.currency)}</span>
+                                    </div>
+                                    <div className="flex items-center gap-4 text-xs text-muted-foreground/80 lowercase">
+                                        <span>apr: {(debt.interestRate / 100).toFixed(2)}%</span>
+                                        <span>min: {formatMoney(debt.minimumPayment, debt.currency)}</span>
                                     </div>
                                     <div className="w-48 bg-secondary h-1.5 rounded-full mt-1 overflow-hidden">
                                         <div

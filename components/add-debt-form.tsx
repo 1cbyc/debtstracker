@@ -107,6 +107,42 @@ export function AddDebtForm() {
                 </div>
             </div>
 
+            <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">apr (%) - 0 if none</label>
+                    <Input
+                        name="interestRate"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        required
+                        defaultValue="0"
+                        className="bg-background"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">min. pay</label>
+                    <Input
+                        name="minimumPayment"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        required
+                        defaultValue="0"
+                        className="bg-background"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">next due date</label>
+                    <Input
+                        name="dueDate"
+                        type="date"
+                        required
+                        className="bg-background"
+                    />
+                </div>
+            </div>
+
             <Button type="submit" className="w-full" disabled={pending}>
                 {pending ? "saving..." : "add debt"}
             </Button>
