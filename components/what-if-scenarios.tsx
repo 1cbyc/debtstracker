@@ -52,6 +52,16 @@ export default function WhatIfScenarios({ debts }: WhatIfScenariosProps) {
     setScenarios(scenarios.filter(s => s.id !== id));
   };
 
+  // Helper function to format time to freedom
+  const formatTimeToFreedom = (months: number) => {
+    if (months <= 0) return "Already debt-free!";
+    const years = Math.floor(months / 12);
+    const remainingMonths = months % 12;
+    if (years === 0) return `${months} months`;
+    if (remainingMonths === 0) return `${years} year${years > 1 ? 's' : ''}`;
+    return `${years}y ${remainingMonths}m`;
+  };
+
   // Calculate results for all scenarios
   const scenarioResults = scenarios.map(scenario => {
     // Simplified calculation - in real app would use the advanced interest functions
@@ -63,10 +73,19 @@ export default function WhatIfScenarios({ debts }: WhatIfScenariosProps) {
     const averageRate = debts.reduce((sum, debt) => sum + debt.interestRate, 0) / Math.max(debts.length, 1);
     const monthlyRate = (averageRate / 10000) / 12;
     
-    // Estimate payoff time using financial formula
-    const estimatedMonths = totalDebt > 0 && totalMonthlyPayment > (totalDebt * monthlyRate) 
-      ? Math.log(1 + (totalDebt * monthlyRate) / (totalMonthlyPayment - (totalDebt * monthlyRate))) / Math.log(1 + monthlyRate)
-      : 0;
+    // Handle zero interest rate case to prevent division by zero
+    let estimatedMonths = 0;
+    if (monthlyRate === 0) {
+      // Simple division for 0% interest
+      estimatedMonths = totalDebt > 0 && totalMonthlyPayment > 0 
+        ? totalDebt / totalMonthlyPayment 
+        : 0;
+    } else {
+      // Use compound interest formula
+      estimatedMonths = totalDebt > 0 && totalMonthlyPayment > (totalDebt * monthlyRate) 
+        ? Math.log(1 + (totalDebt * monthlyRate) / (totalMonthlyPayment - (totalDebt * monthlyRate))) / Math.log(1 + monthlyRate)
+        : 0;
+    }
     
     const totalInterest = Math.max(0, (totalMonthlyPayment * estimatedMonths) - totalDebt);
     
@@ -85,14 +104,6 @@ export default function WhatIfScenarios({ debts }: WhatIfScenariosProps) {
     current.totalInterest < best.totalInterest ? current : best
   );
 
-  const formatTimeToFreedom = (months: number) => {
-    if (months <= 0) return "Already debt-free!";
-    const years = Math.floor(months / 12);
-    const remainingMonths = months % 12;
-    if (years === 0) return `${months} months`;
-    if (remainingMonths === 0) return `${years} year${years > 1 ? 's' : ''}`;
-    return `${years}y ${remainingMonths}m`;
-  };
 
   const getScenarioColor = (scenarioId: string) => {
     if (scenarioId === bestScenario.scenario.id) return "border-green-500 bg-green-50";

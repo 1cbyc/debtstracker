@@ -84,7 +84,7 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
         }
     };
 
-    const exportData = async () => {
+    const exportData = async (customOptions = exportOptions) => {
         setIsExporting(true);
         
         try {
@@ -94,10 +94,10 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
             const data = {
                 exportInfo: {
                     timestamp: new Date().toISOString(),
-                    dateRange: exportOptions.dateRange,
-                    format: exportOptions.format,
+                    dateRange: customOptions.dateRange,
+                    format: customOptions.format,
                 },
-                debts: exportOptions.includeDebts ? debts.map(debt => ({
+                debts: customOptions.includeDebts ? debts.map(debt => ({
                     id: debt.id,
                     name: debt.name,
                     currentBalance: debt.currentBalance,
@@ -106,13 +106,15 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
                     currency: debt.currency,
                     createdAt: debt.createdAt.toISOString(),
                 })) : [],
-                goals: exportOptions.includeGoals ? goals.map(goal => ({
+                goals: customOptions.includeGoals ? goals.map(goal => ({
                     id: goal.id,
                     name: goal.name,
                     targetAmount: goal.targetAmount,
                     currentAmount: goal.currentAmount,
                     currency: goal.currency,
-                    progress: (goal.currentAmount / goal.targetAmount * 100).toFixed(2) + '%',
+                    progress: goal.targetAmount > 0 
+                        ? (goal.currentAmount / goal.targetAmount * 100).toFixed(2) + '%'
+                        : '0%',
                     createdAt: goal.createdAt.toISOString(),
                 })) : [],
                 // Mock payment history
@@ -126,7 +128,7 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
                     }
                 ] : [],
                 // Mock reports
-                reports: exportOptions.includeReports ? [
+                reports: customOptions.includeReports ? [
                     {
                         month: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
                         totalDebt: debts.reduce((sum, debt) => sum + debt.currentBalance, 0),
@@ -136,11 +138,11 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
                 ] : [],
             };
 
-            if (exportOptions.format === 'csv') {
+            if (customOptions.format === 'csv') {
                 exportCSV(data);
-            } else if (exportOptions.format === 'json') {
+            } else if (customOptions.format === 'json') {
                 exportJSON(data);
-            } else if (exportOptions.format === 'pdf') {
+            } else if (customOptions.format === 'pdf') {
                 exportPDF(data);
             }
             
@@ -200,15 +202,15 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
             description: 'Export all debt information as spreadsheet',
             icon: <CreditCard className="h-5 w-5" />,
             onClick: () => {
-                setExportOptions({
+                const quickOptions = {
                     ...exportOptions,
-                    format: 'csv',
+                    format: 'csv' as const,
                     includeDebts: true,
                     includeGoals: false,
                     includePayments: false,
                     includeReports: false,
-                });
-                setTimeout(() => exportData(), 100);
+                };
+                exportData(quickOptions);
             }
         },
         {
@@ -216,15 +218,15 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
             description: 'Export goal tracking and progress data',
             icon: <Target className="h-5 w-5" />,
             onClick: () => {
-                setExportOptions({
+                const quickOptions = {
                     ...exportOptions,
-                    format: 'csv',
+                    format: 'csv' as const,
                     includeDebts: false,
                     includeGoals: true,
                     includePayments: false,
                     includeReports: false,
-                });
-                setTimeout(() => exportData(), 100);
+                };
+                exportData(quickOptions);
             }
         },
         {
@@ -232,15 +234,15 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
             description: 'Full data backup in JSON format',
             icon: <Database className="h-5 w-5" />,
             onClick: () => {
-                setExportOptions({
+                const quickOptions = {
                     ...exportOptions,
-                    format: 'json',
-                    includeDebts: true,
-                    includeGoals: true,
+                    format: 'csv' as const,
+                    includeDebts: false,
+                    includeGoals: false,
                     includePayments: true,
-                    includeReports: true,
-                });
-                setTimeout(() => exportData(), 100);
+                    includeReports: false,
+                };
+                exportData(quickOptions);
             }
         },
     ];
