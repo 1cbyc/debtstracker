@@ -15,6 +15,8 @@ import {
     Settings,
     Check
 } from "lucide-react";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 interface ExportOptions {
     dateRange: 'all' | 'year' | '6months' | '3months' | 'month';
@@ -185,8 +187,71 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
     };
 
     const exportPDF = (data: any) => {
-        // This would integrate with a PDF library like jsPDF
-        alert('PDF export would be implemented with jsPDF library');
+        try {
+            const doc = new jsPDF();
+            
+            // Title
+            doc.setFontSize(20);
+            doc.text('Debt Tracker Data Export', 14, 20);
+            
+            // Export info
+            doc.setFontSize(10);
+            doc.text(`Export Date: ${new Date().toLocaleDateString()}`, 14, 30);
+            doc.text(`Date Range: ${getDateRangeLabel(data.exportInfo.dateRange)}`, 14, 36);
+            
+            let yPosition = 45;
+            
+            // Debts section
+            if (data.debts.length > 0) {
+                doc.setFontSize(14);
+                doc.text('Debts', 14, yPosition);
+                yPosition += 5;
+                
+                const debtRows = data.debts.map((debt: any) => [
+                    debt.name,
+                    `${(debt.currentBalance / 100).toFixed(2)}`,
+                    `${(debt.minimumPayment / 100).toFixed(2)}`,
+                    `${(debt.interestRate / 100).toFixed(2)}%`,
+                ]);
+                
+                (doc as any).autoTable({
+                    startY: yPosition,
+                    head: [['Name', 'Balance', 'Min Payment', 'APR']],
+                    body: debtRows,
+                    theme: 'grid',
+                    headStyles: { fillColor: [239, 68, 68] },
+                });
+                
+                yPosition = (doc as any).lastAutoTable.finalY + 10;
+            }
+            
+            // Goals section
+            if (data.goals.length > 0) {
+                doc.setFontSize(14);
+                doc.text('Goals', 14, yPosition);
+                yPosition += 5;
+                
+                const goalRows = data.goals.map((goal: any) => [
+                    goal.name,
+                    `${(goal.targetAmount / 100).toFixed(2)}`,
+                    `${(goal.currentAmount / 100).toFixed(2)}`,
+                    goal.progress,
+                ]);
+                
+                (doc as any).autoTable({
+                    startY: yPosition,
+                    head: [['Name', 'Target', 'Current', 'Progress']],
+                    body: goalRows,
+                    theme: 'grid',
+                    headStyles: { fillColor: [34, 197, 94] },
+                });
+            }
+            
+            doc.save(`debt-tracker-export-${new Date().toISOString().split('T')[0]}.pdf`);
+        } catch (error) {
+            console.error('PDF export failed:', error);
+            alert('Failed to generate PDF. Please try again.');
+        }
     };
 
     const quickExports = [

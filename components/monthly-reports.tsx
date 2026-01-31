@@ -16,6 +16,8 @@ import {
     AlertTriangle
 } from "lucide-react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 interface MonthlyReportData {
     month: string;
@@ -104,8 +106,58 @@ export default function MonthlyReports({ debts }: MonthlyReportsProps) {
     };
 
     const generatePDF = () => {
-        // This would integrate with a PDF library like jsPDF
-        alert('PDF generation would be implemented here');
+        try {
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(20);
+            doc.text('Monthly Financial Report', 14, 20);
+            
+            // Add date range
+            doc.setFontSize(12);
+            doc.text(`Report for: ${selectedReport.month}`, 14, 30);
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 37);
+            
+            // Add summary section
+            doc.setFontSize(14);
+            doc.text('Summary', 14, 50);
+            
+            doc.setFontSize(10);
+            const summaryData = [
+                ['Total Payments', formatCurrency(selectedReport.totalPaid, currency)],
+                ['Payments Made', selectedReport.paymentsMade.toString()],
+                ['Debt Reduction', formatCurrency(selectedReport.debtReduction, currency)],
+                ['Interest Paid', formatCurrency(selectedReport.interestPaid, currency)],
+                ['Principal Paid', formatCurrency(selectedReport.principalPaid, currency)],
+                ['Total Debt Remaining', formatCurrency(selectedReport.totalDebt, currency)],
+            ];
+            
+            (doc as any).autoTable({
+                startY: 55,
+                head: [['Metric', 'Value']],
+                body: summaryData,
+                theme: 'grid',
+                headStyles: { fillColor: [59, 130, 246] },
+            });
+            
+            // Add insights section
+            if (selectedReport.insights.length > 0) {
+                const finalY = (doc as any).lastAutoTable.finalY || 120;
+                doc.setFontSize(14);
+                doc.text('Key Insights', 14, finalY + 10);
+                
+                doc.setFontSize(10);
+                selectedReport.insights.forEach((insight, index) => {
+                    doc.text(`• ${insight}`, 14, finalY + 20 + (index * 7));
+                });
+            }
+            
+            // Save the PDF
+            doc.save(`monthly-report-${selectedReport.month.replace(' ', '-')}.pdf`);
+        } catch (error) {
+            console.error('PDF generation failed:', error);
+            alert('Failed to generate PDF. Please try again.');
+        }
     };
 
     const exportData = () => {
