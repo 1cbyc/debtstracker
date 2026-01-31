@@ -42,15 +42,15 @@ export default async function DebtsPage() {
             {userDebts.length === 0 ? (
                 <div className="text-center py-20 border border-dashed rounded-lg bg-card">
                     <p className="text-muted-foreground mb-4">no active debts. clean slate!</p>
-                    <div className="flex gap-4">
-                        <Link href="/dashboard/debts/add">
-                            <Button>add your first debt</Button>
+                    <div className="flex flex-col md:flex-row gap-3 max-w-md mx-auto">
+                        <Link href="/dashboard/debts/add" className="w-full md:w-auto">
+                            <Button className="w-full md:w-auto">add your first debt</Button>
                         </Link>
-                        <Link href="/dashboard/budget">
-                            <Button variant="outline">setup budget</Button>
+                        <Link href="/dashboard/budget" className="w-full md:w-auto">
+                            <Button variant="outline" className="w-full md:w-auto">setup budget</Button>
                         </Link>
-                        <Link href="/dashboard/strategy">
-                            <Button variant="secondary">view strategy</Button>
+                        <Link href="/dashboard/strategy" className="w-full md:w-auto">
+                            <Button variant="secondary" className="w-full md:w-auto">view strategy</Button>
                         </Link>
                     </div>
                 </div>
