@@ -351,56 +351,56 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
                     {/* Data Selection */}
                     <div className="space-y-3">
                         <h4 className="font-medium">Include Data</h4>
-                        <div className="grid grid-cols-2 gap-3">
-                            <label className="flex items-center space-x-3 cursor-pointer">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label className="flex items-center space-x-3 cursor-pointer min-h-[44px]">
                                 <input
                                     type="checkbox"
                                     checked={exportOptions.includeDebts}
                                     onChange={(e) => setExportOptions({...exportOptions, includeDebts: e.target.checked})}
-                                    className="rounded"
+                                    className="rounded flex-shrink-0"
                                 />
                                 <div className="flex items-center gap-2">
-                                    <CreditCard className="h-4 w-4" />
-                                    <span>Debts ({debts.length})</span>
+                                    <CreditCard className="h-4 w-4 flex-shrink-0" />
+                                    <span className="whitespace-nowrap">Debts ({debts.length})</span>
                                 </div>
                             </label>
 
-                            <label className="flex items-center space-x-3 cursor-pointer">
+                            <label className="flex items-center space-x-3 cursor-pointer min-h-[44px]">
                                 <input
                                     type="checkbox"
                                     checked={exportOptions.includeGoals}
                                     onChange={(e) => setExportOptions({...exportOptions, includeGoals: e.target.checked})}
-                                    className="rounded"
+                                    className="rounded flex-shrink-0"
                                 />
                                 <div className="flex items-center gap-2">
-                                    <Target className="h-4 w-4" />
-                                    <span>Goals ({goals.length})</span>
+                                    <Target className="h-4 w-4 flex-shrink-0" />
+                                    <span className="whitespace-nowrap">Goals ({goals.length})</span>
                                 </div>
                             </label>
 
-                            <label className="flex items-center space-x-3 cursor-pointer">
+                            <label className="flex items-center space-x-3 cursor-pointer min-h-[44px]">
                                 <input
                                     type="checkbox"
                                     checked={exportOptions.includePayments}
                                     onChange={(e) => setExportOptions({...exportOptions, includePayments: e.target.checked})}
-                                    className="rounded"
+                                    className="rounded flex-shrink-0"
                                 />
                                 <div className="flex items-center gap-2">
-                                    <Database className="h-4 w-4" />
-                                    <span>Payment History</span>
+                                    <Database className="h-4 w-4 flex-shrink-0" />
+                                    <span className="whitespace-nowrap">Payment History</span>
                                 </div>
                             </label>
 
-                            <label className="flex items-center space-x-3 cursor-pointer">
+                            <label className="flex items-center space-x-3 cursor-pointer min-h-[44px]">
                                 <input
                                     type="checkbox"
                                     checked={exportOptions.includeReports}
                                     onChange={(e) => setExportOptions({...exportOptions, includeReports: e.target.checked})}
-                                    className="rounded"
+                                    className="rounded flex-shrink-0"
                                 />
                                 <div className="flex items-center gap-2">
-                                    <FileText className="h-4 w-4" />
-                                    <span>Monthly Reports</span>
+                                    <FileText className="h-4 w-4 flex-shrink-0" />
+                                    <span className="whitespace-nowrap">Monthly Reports</span>
                                 </div>
                             </label>
                         </div>

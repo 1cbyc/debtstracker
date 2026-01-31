@@ -20,7 +20,7 @@ export async function AppSidebar() {
     const user = session?.user;
 
     return (
-        <aside className="w-64 border-r border-border h-screen flex flex-col fixed left-0 top-0 bg-card">
+        <aside className="w-64 border-r border-border h-screen flex flex-col fixed left-0 top-0 bg-card hidden md:flex">
             <div className="p-6 border-b border-border">
                 <div className="font-bold text-xl tracking-tighter lowercase">debtstracker</div>
             </div>
