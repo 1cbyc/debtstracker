@@ -33,7 +33,7 @@ export function SignupForm() {
     return (
         <Card className="w-full max-w-md mx-auto">
             <CardHeader>
-                <CardTitle>sign up</CardTitle>
+                <CardTitle>Sign Up</CardTitle>
                 <CardDescription>create an account to start tracking your debts</CardDescription>
             </CardHeader>
             <CardContent>

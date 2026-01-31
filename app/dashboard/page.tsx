@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
+import FinancialHealthMetrics from "@/components/financial-health-metrics";
 
 async function getDashboardData(userId: string) {
     // Fetch debts
@@ -20,26 +21,33 @@ async function getDashboardData(userId: string) {
         where: eq(goals.userId, userId),
     });
 
+    // Fetch all transactions for broader analysis
+    const allTransactions = await db.query.transactions.findMany({
+        where: eq(transactions.userId, userId),
+        orderBy: [desc(transactions.date)],
+    });
+
     // Calculate Paid This Month
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-    const monthlyTransactions = await db.query.transactions.findMany({
-        where: (t, { and, eq, gte, lte }) => and(
-            eq(t.userId, userId),
-            eq(t.type, "payment"),
-            gte(t.date, startOfMonth),
-            lte(t.date, endOfMonth)
-        )
-    });
+    const monthlyTransactions = allTransactions.filter(t => 
+        t.date >= startOfMonth && t.date <= endOfMonth && t.type === "payment"
+    );
+
+    // Calculate monthly income for health metrics
+    const monthlyIncome = allTransactions
+        .filter(t => t.date >= startOfMonth && t.date <= endOfMonth && t.type === "income")
+        .reduce((acc, t) => {
+            acc[t.currency] = (acc[t.currency] || 0) + t.amount;
+            return acc;
+        }, {} as Record<string, number>);
 
     // Group paid totals by currency
     const paidByCurrency: Record<string, number> = {};
     monthlyTransactions.forEach(t => {
-        // Use currency directly from transaction - no fallback needed since currency is required
-        const currency = t.currency;
-        paidByCurrency[currency] = (paidByCurrency[currency] || 0) + t.amount;
+        paidByCurrency[t.currency] = (paidByCurrency[t.currency] || 0) + t.amount;
     });
 
     // Group Total Debt by currency
@@ -48,18 +56,44 @@ async function getDashboardData(userId: string) {
         debtByCurrency[d.currency] = (debtByCurrency[d.currency] || 0) + d.currentBalance;
     });
 
-    // Savings Total (Only have amounts, assuming single currency for simplicity or implement similar grouping)
-    // Let's assume goals are NGN for now or just sum them.
-    const savingsTotal = userGoals.reduce((acc, g) => acc + g.currentAmount, 0);
+    // Calculate goals achievements
+    const goalsAchieved = userGoals.filter(g => g.currentAmount >= g.targetAmount).length;
 
-    return { userDebts, userGoals, debtByCurrency, paidByCurrency, savingsTotal };
+    // Savings Total grouped by currency
+    const savingsByCurrency: Record<string, number> = {};
+    userGoals.forEach(g => {
+        savingsByCurrency[g.currency] = (savingsByCurrency[g.currency] || 0) + g.currentAmount;
+    });
+    
+    // For simplicity, use NGN total for now
+    const totalSavings = savingsByCurrency.NGN || 0;
+
+    return { 
+        userDebts, 
+        userGoals, 
+        debtByCurrency, 
+        paidByCurrency, 
+        totalSavings,
+        monthlyIncome,
+        goalsAchieved,
+        allTransactions
+    };
 }
 
 export default async function Dashboard() {
     const session = await auth();
     if (!session?.user?.id) return null;
 
-    const { userDebts, debtByCurrency, paidByCurrency, savingsTotal } = await getDashboardData(session.user.id);
+    const { 
+        userDebts, 
+        userGoals, 
+        debtByCurrency, 
+        paidByCurrency, 
+        totalSavings,
+        monthlyIncome,
+        goalsAchieved,
+        allTransactions
+    } = await getDashboardData(session.user.id);
 
     const formatMoney = (amount: number, currency = "NGN") => {
         return new Intl.NumberFormat("en-NG", {
@@ -84,18 +118,33 @@ export default async function Dashboard() {
     return (
         <div className="space-y-8">
             <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold tracking-tight">dashboard</h1>
+                <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
                 <Link href="/dashboard/debts/add">
                     <Button size="sm" className="gap-2">
-                        <Plus className="h-4 w-4" /> add debt
+                        <Plus className="h-4 w-4" /> Add Debt
                     </Button>
                 </Link>
             </div>
 
+            {/* Financial Health Analytics */}
+            <div className="space-y-4">
+                <h2 className="text-xl font-bold tracking-tight">Financial Health Overview</h2>
+                <FinancialHealthMetrics
+                    totalDebt={debtByCurrency}
+                    totalSavings={totalSavings}
+                    monthlyPayments={paidByCurrency}
+                    monthlyIncome={monthlyIncome}
+                    debtCount={userDebts.length}
+                    goalsAchieved={goalsAchieved}
+                    totalGoals={userGoals.length}
+                />
+            </div>
+
+            {/* Quick Stats Cards */}
             <div className="grid gap-4 md:grid-cols-3">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">total debt</CardTitle>
+                        <CardTitle className="text-sm font-medium">Total Debt</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {renderCurrencyTotals(debtByCurrency)}
@@ -104,7 +153,7 @@ export default async function Dashboard() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">paid this month</CardTitle>
+                        <CardTitle className="text-sm font-medium">Paid This Month</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {renderCurrencyTotals(paidByCurrency)}
@@ -113,10 +162,10 @@ export default async function Dashboard() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">total savings</CardTitle>
+                        <CardTitle className="text-sm font-medium">Total Savings</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{formatMoney(savingsTotal)}</div>
+                        <div className="text-2xl font-bold">{formatMoney(totalSavings)}</div>
                         <p className="text-xs text-muted-foreground">total saved</p>
                     </CardContent>
                 </Card>
@@ -124,13 +173,13 @@ export default async function Dashboard() {
 
             <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold tracking-tight">active debts</h2>
-                    <Link href="/dashboard/debts" className="text-sm text-muted-foreground hover:underline">view all</Link>
+                    <h2 className="text-xl font-bold tracking-tight">Active Debts</h2>
+                    <Link href="/dashboard/debts" className="text-sm text-muted-foreground hover:underline">View All</Link>
                 </div>
 
                 {userDebts.length === 0 ? (
                     <div className="text-center py-12 border border-dashed rounded-lg bg-card">
-                        <p className="text-muted-foreground">no debts recorded. you're free!</p>
+                        <p className="text-muted-foreground">No debts recorded. You're financially free!</p>
                     </div>
                 ) : (
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -180,6 +229,9 @@ export default async function Dashboard() {
                                                 className="bg-primary h-full transition-all duration-500"
                                                 style={{ width: `${Math.max(0, 100 - (debt.currentBalance / debt.totalAmount * 100))}%` }}
                                             />
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                            {Math.max(0, 100 - (debt.currentBalance / debt.totalAmount * 100)).toFixed(1)}% paid off
                                         </div>
                                     </div>
                                 </CardContent>

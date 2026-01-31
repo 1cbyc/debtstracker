@@ -41,7 +41,7 @@ export function LoginForm() {
     return (
         <Card className="w-full max-w-md mx-auto">
             <CardHeader>
-                <CardTitle>login</CardTitle>
+                <CardTitle>Login</CardTitle>
                 <CardDescription>enter your credentials to access your account</CardDescription>
             </CardHeader>
             <CardContent>

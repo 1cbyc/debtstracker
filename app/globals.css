@@ -40,9 +40,4 @@
     color: hsl(var(--foreground));
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   }
-
-  /* Apply lowercase to all text */
-  body * {
-    text-transform: lowercase;
-  }
 }
