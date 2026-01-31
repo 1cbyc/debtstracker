@@ -5,7 +5,7 @@ import { eq, desc, sum, and, gte, lte } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 async function getDashboardData(userId: string) {
@@ -150,7 +150,7 @@ export default async function Dashboard() {
                                                 <Link href={`/dashboard/debts/edit/${debt.id}`}>
                                                     <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                                                         <span className="sr-only">Edit</span>
-                                                        ✏️
+                                                        <Edit className="h-3 w-3" />
                                                     </Button>
                                                 </Link>
                                                 <form action={async () => {
@@ -160,7 +160,7 @@ export default async function Dashboard() {
                                                 }} className="inline">
                                                     <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-red-500 hover:text-red-700">
                                                         <span className="sr-only">Delete</span>
-                                                        🗑️
+                                                        <Trash2 className="h-3 w-3" />
                                                     </Button>
                                                 </form>
                                             </div>
