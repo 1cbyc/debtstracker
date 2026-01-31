@@ -9,6 +9,9 @@ import {
     TrendingUp,
     Wallet,
     FileText,
+    Calendar,
+    BarChart,
+    Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,44 +22,62 @@ export async function AppSidebar() {
     return (
         <aside className="w-64 border-r border-border h-screen flex flex-col fixed left-0 top-0 bg-card">
             <div className="p-6 border-b border-border">
-                <div className="font-bold text-xl tracking-tighter">debtstracker</div>
+                <div className="font-bold text-xl tracking-tighter lowercase">debtstracker</div>
             </div>
 
             <nav className="flex-1 p-4 space-y-2">
                 <Link href="/dashboard">
                     <Button variant="ghost" className="w-full justify-start gap-2">
                         <LayoutDashboard className="h-4 w-4" />
-                        dashboard
+                        Dashboard
                     </Button>
                 </Link>
                 <Link href="/dashboard/debts">
                     <Button variant="ghost" className="w-full justify-start gap-2">
                         <CreditCard className="h-4 w-4" />
-                        debts
+                        Debts
                     </Button>
                 </Link>
                 <Link href="/dashboard/strategy">
                     <Button variant="ghost" className="w-full justify-start gap-2">
                         <TrendingUp className="h-4 w-4" />
-                        strategy
+                        Strategy
+                    </Button>
+                </Link>
+                <Link href="/dashboard/payments">
+                    <Button variant="ghost" className="w-full justify-start gap-2">
+                        <Calendar className="h-4 w-4" />
+                        Payments
                     </Button>
                 </Link>
                 <Link href="/dashboard/budget">
                     <Button variant="ghost" className="w-full justify-start gap-2">
                         <Wallet className="h-4 w-4" />
-                        budget
+                        Budget
                     </Button>
                 </Link>
                 <Link href="/dashboard/reports">
                     <Button variant="ghost" className="w-full justify-start gap-2">
                         <FileText className="h-4 w-4" />
-                        reports
+                        Reports
+                    </Button>
+                </Link>
+                <Link href="/dashboard/reports/monthly">
+                    <Button variant="ghost" className="w-full justify-start gap-2 ml-4">
+                        <BarChart className="h-4 w-4" />
+                        Monthly Reports
+                    </Button>
+                </Link>
+                <Link href="/dashboard/export">
+                    <Button variant="ghost" className="w-full justify-start gap-2">
+                        <Download className="h-4 w-4" />
+                        Data Export
                     </Button>
                 </Link>
                 <Link href="/dashboard/goals">
                     <Button variant="ghost" className="w-full justify-start gap-2">
                         <Target className="h-4 w-4" />
-                        goals
+                        Goals
                     </Button>
                 </Link>
             </nav>
@@ -87,7 +108,7 @@ export async function AppSidebar() {
                 >
                     <Button variant="destructive" className="w-full justify-start gap-2" size="sm">
                         <LogOut className="h-4 w-4" />
-                        sign out
+                        Sign Out
                     </Button>
                 </form>
             </div>

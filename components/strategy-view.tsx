@@ -8,6 +8,7 @@ import { calculatePayoffStrategy, DebtWithExtras, PayoffStrategy, formatCurrency
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, TrendingDown, Calendar, DollarSign } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Bar, BarChart } from "recharts";
+import WhatIfScenarios from "./what-if-scenarios";
 
 interface StrategyViewProps {
     debts: DebtWithExtras[];
@@ -217,6 +218,9 @@ export default function StrategyView({ debts }: StrategyViewProps) {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* What-If Scenarios */}
+            <WhatIfScenarios debts={debts} />
 
             {/* Debt Burndown Chart */}
             <Card>
