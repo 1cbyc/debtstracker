@@ -183,7 +183,7 @@ export default async function Dashboard() {
                         <p className="text-muted-foreground">No debts recorded. You're financially free!</p>
                     </div>
                 ) : (
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {userDebts.slice(0, 6).map((debt) => (
                             <Card key={debt.id} className="relative overflow-hidden">
                                 <div className={`absolute left-0 top-0 bottom-0 w-1 ${debt.priority === 'high' ? 'bg-red-500' :

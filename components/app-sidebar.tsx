@@ -27,55 +27,55 @@ export async function AppSidebar() {
 
             <nav className="flex-1 p-4 space-y-2">
                 <Link href="/dashboard">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
+                    <Button variant="ghost" className="w-full justify-start gap-2 min-h-[44px]">
                         <LayoutDashboard className="h-4 w-4" />
                         Dashboard
                     </Button>
                 </Link>
                 <Link href="/dashboard/debts">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
+                    <Button variant="ghost" className="w-full justify-start gap-2 min-h-[44px]">
                         <CreditCard className="h-4 w-4" />
                         Debts
                     </Button>
                 </Link>
                 <Link href="/dashboard/strategy">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
+                    <Button variant="ghost" className="w-full justify-start gap-2 min-h-[44px]">
                         <TrendingUp className="h-4 w-4" />
                         Strategy
                     </Button>
                 </Link>
                 <Link href="/dashboard/payments">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
+                    <Button variant="ghost" className="w-full justify-start gap-2 min-h-[44px]">
                         <Calendar className="h-4 w-4" />
                         Payments
                     </Button>
                 </Link>
                 <Link href="/dashboard/budget">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
+                    <Button variant="ghost" className="w-full justify-start gap-2 min-h-[44px]">
                         <Wallet className="h-4 w-4" />
                         Budget
                     </Button>
                 </Link>
                 <Link href="/dashboard/reports">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
+                    <Button variant="ghost" className="w-full justify-start gap-2 min-h-[44px]">
                         <FileText className="h-4 w-4" />
                         Reports
                     </Button>
                 </Link>
                 <Link href="/dashboard/reports/monthly">
-                    <Button variant="ghost" className="w-full justify-start gap-2 ml-4">
+                    <Button variant="ghost" className="w-full justify-start gap-2 ml-4 min-h-[44px]">
                         <BarChart className="h-4 w-4" />
                         Monthly Reports
                     </Button>
                 </Link>
                 <Link href="/dashboard/export">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
+                    <Button variant="ghost" className="w-full justify-start gap-2 min-h-[44px]">
                         <Download className="h-4 w-4" />
                         Data Export
                     </Button>
                 </Link>
                 <Link href="/dashboard/goals">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
+                    <Button variant="ghost" className="w-full justify-start gap-2 min-h-[44px]">
                         <Target className="h-4 w-4" />
                         Goals
                     </Button>
