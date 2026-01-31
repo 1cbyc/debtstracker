@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Bell, DollarSign, Settings, Plus, X } from "lucide-react";
+import { Calendar, Clock, Bell, Settings, Plus, X } from "lucide-react";
 
 interface PaymentScheduleEntry {
     id: string;
@@ -83,8 +83,8 @@ export default function PaymentSchedule({ debts }: PaymentScheduleProps) {
         const now = new Date();
         const due = new Date(schedule.dueDate);
         
-        // If due date has passed, calculate next occurrence based on frequency
-        if (due <= now) {
+        // Keep advancing date until it's in the future
+        while (due <= now) {
             switch (schedule.frequency) {
                 case 'weekly':
                     due.setDate(due.getDate() + 7);

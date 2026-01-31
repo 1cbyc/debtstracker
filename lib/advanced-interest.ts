@@ -96,7 +96,7 @@ export function calculateAdvancedPayoff(
       principalPaid: principalPayment,
       interestPaid: interestThisMonth,
       balanceRemaining: balance,
-      effectiveRate: currentRate * 12 // Annualized for display
+      effectiveRate: currentRate // Already an annual rate, don't multiply by 12
     });
     
     // Safety check

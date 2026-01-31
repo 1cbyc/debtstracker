@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
     Calendar, 
@@ -76,8 +75,8 @@ export default function MonthlyReports({ debts }: MonthlyReportsProps) {
                 goalsAchieved: i % 3 === 0 ? [`Pay extra $${Math.floor(Math.random() * 200) + 100}`] : [],
                 milestones: i % 4 === 0 ? [`Paid off ${debts[Math.floor(Math.random() * debts.length)]?.name || 'Credit Card'}`] : [],
                 insights: [
-                    `Debt reduced by ${((debtReduction / totalDebt) * 100).toFixed(1)}%`,
-                    `${((principalPaid / monthlyPayment) * 100).toFixed(1)}% of payments went to principal`,
+                    `Debt reduced by ${totalDebt > 0 ? ((debtReduction / totalDebt) * 100).toFixed(1) : '0.0'}%`,
+                    `${monthlyPayment > 0 ? ((principalPaid / monthlyPayment) * 100).toFixed(1) : '0.0'}% of payments went to principal`,
                 ]
             });
         }
@@ -85,9 +84,10 @@ export default function MonthlyReports({ debts }: MonthlyReportsProps) {
         return reports.reverse();
     }, [debts]);
 
-    const selectedReport = reportData.find((_, index) => 
-        index === (selectedYear - 2024) * 12 + selectedMonth
-    ) || reportData[reportData.length - 1];
+    const selectedReport = reportData.find(report => {
+        const reportDate = new Date(report.month);
+        return reportDate.getFullYear() === selectedYear && reportDate.getMonth() === selectedMonth;
+    }) || reportData[reportData.length - 1];
 
     const formatCurrency = (amount: number, currency: string = 'USD') => {
         return new Intl.NumberFormat('en-US', {

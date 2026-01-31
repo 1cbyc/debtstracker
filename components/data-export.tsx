@@ -57,13 +57,6 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
     const [isExporting, setIsExporting] = useState(false);
     const [lastExport, setLastExport] = useState<Date | null>(null);
 
-    const formatCurrency = (amount: number, currency: string = 'USD') => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency,
-        }).format(amount / 100);
-    };
-
     const getDateRangeLabel = (range: string) => {
         switch (range) {
             case 'all': return 'All Time';
@@ -162,7 +155,7 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
             csvContent += 'DEBTS\n';
             csvContent += 'Name,Current Balance,Minimum Payment,Interest Rate,Currency,Created At\n';
             data.debts.forEach((debt: any) => {
-                csvContent += `"${debt.name}",${debt.currentBalance},${debt.minimumPayment},${debt.interestRate}%,${debt.currency},${debt.createdAt}\n`;
+                csvContent += `"${debt.name}",${debt.currentBalance},${debt.minimumPayment},${(debt.interestRate / 100).toFixed(2)}%,${debt.currency},${debt.createdAt}\n`;
             });
             csvContent += '\n';
         }
@@ -434,7 +427,7 @@ export default function DataExport({ debts, goals = [] }: DataExportProps) {
 
                     {/* Export Button */}
                     <Button 
-                        onClick={exportData} 
+                        onClick={() => exportData()} 
                         disabled={isExporting || (!exportOptions.includeDebts && !exportOptions.includeGoals && !exportOptions.includePayments && !exportOptions.includeReports)}
                         className="w-full flex items-center gap-2"
                         size="lg"

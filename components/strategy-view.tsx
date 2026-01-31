@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { calculatePayoffStrategy, DebtWithExtras, PayoffStrategy, formatCurrency, getPriorityColor } from "@/lib/strategy";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, TrendingDown, Calendar, DollarSign, Lightbulb } from "lucide-react";
+import { ArrowRight, TrendingDown, Calendar, DollarSign } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Bar, BarChart } from "recharts";
 import WhatIfScenarios from "./what-if-scenarios";
 

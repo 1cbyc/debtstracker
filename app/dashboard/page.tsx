@@ -21,24 +21,27 @@ async function getDashboardData(userId: string) {
         where: eq(goals.userId, userId),
     });
 
-    // Fetch all transactions for broader analysis
-    const allTransactions = await db.query.transactions.findMany({
-        where: eq(transactions.userId, userId),
-        orderBy: [desc(transactions.date)],
-    });
-
-    // Calculate Paid This Month
+    // Calculate current month dates
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-    const monthlyTransactions = allTransactions.filter(t => 
-        t.date >= startOfMonth && t.date <= endOfMonth && t.type === "payment"
-    );
+    // Fetch only current month transactions from database
+    const monthlyTransactions = await db.query.transactions.findMany({
+        where: and(
+            eq(transactions.userId, userId),
+            gte(transactions.date, startOfMonth),
+            lte(transactions.date, endOfMonth)
+        ),
+        orderBy: [desc(transactions.date)],
+    });
+
+    // Separate by transaction type
+    const monthlyPayments = monthlyTransactions.filter(t => t.type === "payment");
+    const monthlyIncomeTransactions = monthlyTransactions.filter(t => t.type === "income");
 
     // Calculate monthly income for health metrics
-    const monthlyIncome = allTransactions
-        .filter(t => t.date >= startOfMonth && t.date <= endOfMonth && t.type === "income")
+    const monthlyIncome = monthlyIncomeTransactions
         .reduce((acc, t) => {
             acc[t.currency] = (acc[t.currency] || 0) + t.amount;
             return acc;
@@ -46,7 +49,7 @@ async function getDashboardData(userId: string) {
 
     // Group paid totals by currency
     const paidByCurrency: Record<string, number> = {};
-    monthlyTransactions.forEach(t => {
+    monthlyPayments.forEach(t => {
         paidByCurrency[t.currency] = (paidByCurrency[t.currency] || 0) + t.amount;
     });
 
@@ -75,8 +78,7 @@ async function getDashboardData(userId: string) {
         paidByCurrency, 
         totalSavings,
         monthlyIncome,
-        goalsAchieved,
-        allTransactions
+        goalsAchieved
     };
 }
 
@@ -91,8 +93,7 @@ export default async function Dashboard() {
         paidByCurrency, 
         totalSavings,
         monthlyIncome,
-        goalsAchieved,
-        allTransactions
+        goalsAchieved
     } = await getDashboardData(session.user.id);
 
     const formatMoney = (amount: number, currency = "NGN") => {
